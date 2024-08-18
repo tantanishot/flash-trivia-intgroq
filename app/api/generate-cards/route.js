@@ -1,6 +1,9 @@
-import { NextResponse } from "next/server";
+
+//i tried changing it to server.js but i dont think i shoudl do that
+import { NextResponse } from 'next/server.js';
 import Groq from 'groq-sdk';
 
+// Define the system prompt for flashcard generation
 const systemPrompt = `
 You are a flashcard creator. Your task is to generate concise and effective flashcards 
 based on the given topic or content.
@@ -18,26 +21,45 @@ Return in the following JSON format:
 
 export async function POST(req) {
     try {
-        const groq = new Groq({
-            apiKey: process.env.GROQ_API_KEY,
-        });
+        console.log("Starting API route...");
+        const apiKey = process.env.GROQ_API_KEY;
+        
+      
+        if (!apiKey) {
+            console.error("Missing GROQ_API_KEY.");
+            return NextResponse.json({ error: "GROQ_API_KEY is missing" }, { status: 500 });
+        }
 
-        const data = await req.text();
+        const groq = new Groq({ apiKey });
 
+        
+        const { topic } = await req.json();
+        console.log("Received topic:", topic);
+
+        
+        if (!topic) {
+            console.error("Topic is missing.");
+            return NextResponse.json({ error: "Topic is required" }, { status: 400 });
+        }
+
+       
         const completion = await groq.chat.completions.create({
-            model: "llama3-70b-8192", 
+            model: "llama3-70b-8192", // Check if the model is valid
             messages: [
                 { role: "system", content: systemPrompt },
-                { role: "user", content: data },
+                { role: "user", content: topic },
             ],
         });
 
-        let responseText = '';
+        
+        console.log('Response from Groq:', completion);
 
-        for await (const chunk of completion) {
-            responseText += chunk.choices[0]?.delta?.content || '';
-        }
+       
+        let responseText = completion.choices[0]?.message?.content || '';
 
+        console.log('Parsed response text from Groq:', responseText);
+
+       
         let flashcards;
         try {
             flashcards = JSON.parse(responseText);
@@ -47,6 +69,7 @@ export async function POST(req) {
         }
 
         return NextResponse.json(flashcards.flashcards, { status: 200 });
+
     } catch (error) {
         console.error("Error in processing the request:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
