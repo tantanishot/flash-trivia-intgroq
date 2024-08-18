@@ -1,13 +1,17 @@
 
 //i tried changing it to server.js but i dont think i shoudl do that
-import { NextResponse } from 'next/server.js';
+import { NextResponse } from 'next/server';
 import Groq from 'groq-sdk';
 
 // Define the system prompt for flashcard generation
 const systemPrompt = `
-You are a flashcard creator. Your task is to generate concise and effective flashcards 
+You are a flashcard creator. Your task task is to generate 10 flashcards explicitly
 based on the given topic or content.
+
 Follow these guidelines:
+
+1. Do not respond with extra responses, strictly follow format below
+2.
 Return in the following JSON format:
 {
     "flashcards": [
@@ -21,7 +25,7 @@ Return in the following JSON format:
 
 export async function POST(req) {
     try {
-        console.log("Starting API route...");
+        //console.log("Starting API route...");
         const apiKey = process.env.GROQ_API_KEY;
         
       
@@ -52,7 +56,7 @@ export async function POST(req) {
         });
 
         
-        console.log('Response from Groq:', completion);
+        //console.log('Response from Groq:', completion);
 
        
         let responseText = completion.choices[0]?.message?.content || '';

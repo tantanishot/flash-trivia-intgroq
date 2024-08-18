@@ -9,53 +9,97 @@ export default function Home() {
   const [flashcards, setFlashcards] = useState([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [chatInput, setChatInput] = useState('');
+  const currentFlashcard = flashcards[currentCardIndex] || { front: 'Front', back: 'Back' };
 
-  // Handle sending the topic to the API and getting flashcards
+  //user input for getting right answer 
+  const [userAnswer, setUserAnswer] = useState('');
+  
+
+  //to control if incorrect or wrong box 
+  const [boxVisible, setBoxVisible] = useState(false);
+  const [boxPosition, setBoxPosition] = useState({ top: '50%', left: '50%' });
+
+  const [isCorrect, setIsCorrect] = useState(null);  // null means no answer yet
+
+
+
+  
   const handleSend = async () => {
     if (!chatInput) return;
 
     try {
-      // Send the input to your API to generate flashcards
+      
       const response = await fetch('/api/generate-cards', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ topic: chatInput }), // The input from the user is the topic for the flashcards
+        body: JSON.stringify({ topic: chatInput }), 
       });
 
       const data = await response.json();
 
-      // Assuming the API returns an array of flashcards
+     
       if (data && data.length > 0) {
-        setFlashcards(data);  // Store the flashcards
-        setCurrentCardIndex(0);  // Reset to the first card
+        setFlashcards(data);  
+        setCurrentCardIndex(0);  
+        setIsCorrect(null);  // Reset
+        setBoxVisible(false);  // Hide the feedback box 
       }
 
     } catch (error) {
       console.error('Error generating flashcards:', error);
     }
 
-    setChatInput('');  // Clear input field
+    setChatInput('');  
   };
 
-  // Navigate to the next flashcard
+ 
   const handleNext = () => {
     setCurrentCardIndex((prevIndex) =>
       prevIndex < flashcards.length - 1 ? prevIndex + 1 : prevIndex
     );
   };
 
-  // Navigate to the previous flashcard
+ 
   const handlePrevious = () => {
     setCurrentCardIndex((prevIndex) =>
       prevIndex > 0 ? prevIndex - 1 : prevIndex
     );
   };
 
-  // Display the current flashcard
-  const currentFlashcard = flashcards[currentCardIndex] || { front: 'Front', back: 'Back' };
+  //submits and checks if string of back card == 
+  const handleAnswerSubmit = () => {
+       //i made it  all lowercase so theres no small details when checking
+       const useAnswer = userAnswer.trim().toLowerCase();
+       const correctAnswer = currentFlashcard.back.trim().toLowerCase();
+    console.log(`User Answer: ${useAnswer}, Correct Answer: ${correctAnswer}`);
+ 
 
+    // Check if the user's answer matches the back of the flashcard
+    if (useAnswer === correctAnswer) {
+      setIsCorrect(true);  // Answer is correct
+    } else {
+      setIsCorrect(false);  // Answer is incorrect
+    }
+
+    setBoxPosition({ top: '10px', left: '50%', transform: 'translateX(-50%)' });  // Position at the top center
+    setBoxVisible(true);  // Show feedback box
+  
+
+
+
+    // Clear the answer input after submission
+    setUserAnswer('');
+
+    //to make it dissapear again
+    setTimeout(() => {
+      setBoxVisible(false);  // Hide the feedback box after 3 seconds
+    }, 3000);
+  };
+  
+ 
+//frontend css
   return (
     <Container maxWidth={false} disableGutters>
       <Head>
@@ -77,88 +121,144 @@ export default function Home() {
       </AppBar>
 
       <Stack
-        direction="column"
-        width="100vw"
-        height="100vh"
-        backgroundColor='#0F0F0F'
-      >
-        <Grid container component="main" alignContent="center" sx={{ height: '100vh', width: '100vw' }}>
-          <CssBaseline />
-          <Grid
-            item
-            alignItems="center"
-            justifyContent="center"
-            alignContent="center"
-            m="auto"
-            xs={false}
-            sm={9}
+  direction="row"
+  width="100vw"
+  height="100vh"
+  sx={{ overflow: 'hidden' }}
+  backgroundColor='#0F0F0F'
+>
+
+
+  
+  <Grid container sx={{ height: '100%', width: '100%' }} alignItems="stretch">
+    
+    {/* Left grid with flashcards */}
+    <Grid
+      item
+      xs={false}
+      sm={9}
+      sx={{
+        backgroundColor: '#0F0F0F',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      {/* Flashcard content */}
+      <Stack direction="column" alignItems="center" justifyContent="center" height="100%">
+        <div className="flip-card" style={{ marginBottom: '30px' }}>
+          <div className="flip-card-inner">
+            <div className="flip-card-front">
+              <Box display="flex" justifyContent="center" alignItems="center" height="100%" textAlign="center" p={2}>
+                <Typography variant="h3">{currentFlashcard.front}</Typography>
+              </Box>
+            </div>
+            <div className="flip-card-back">
+              <Box display="flex" justifyContent="center" alignItems="center" height="100%" textAlign="center" p={2}>
+                <Typography variant="h3">{currentFlashcard.back}</Typography>
+              </Box>
+            </div>
+          </div>
+        </div>
+        
+      {/*Answer buttong*/}
+        <Box borderRadius= "15px" p={2} height="19vh" width="40vw" backgroundColor="#040404" boxShadow="0px 0px 15px #4A4A4A" alignContent="center" style={{ marginBottom: '30px' }}>
+                <Stack
+                  direction="row" height="70%" justifyContent="space-between" spacing={5} >
+                    <Stack
+                      direction="column" height="100%" width="80%"
+                    >
+                      <Typography fontFamily="monospace" variant="h6">Type answer below:</Typography>
+                      <Box borderRadius="15px" backgroundColor="#BFBFBF" height="52%" width="100%">
+                        <TextField fullWidth InputProps={{style : {borderRadius: "15px"}}}></TextField>
+                      </Box>
+                    </Stack>
+                  
+                  <Button variant="filled" onClick={handleAnswerSubmit} sx={{backgroundColor: 'orange', border: '2px solid DarkOrange', boxShadow: '0px 0px 5px DarkOrange'}}>GO</Button>
+                </Stack>
+              </Box>
+
+        <Stack direction="row" spacing={2}>
+          <Box
             sx={{
-              backgroundSize: 'cover',
-              backgroundPosition: 'left',
-              backgroundColor: '#0F0F0F',
+              backgroundColor: '#333333',
+              borderRadius: '10px',
+              padding: '10px 20px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              boxShadow: '0px 0px 15px rgba(0, 0, 0, 0.2)',
             }}
           >
-            <Stack
-              direction="column" width="100%" alignContent="center" alignItems="center" spacing={4}
-            >
-              {/* Flip Card Animation */}
-              <div className="flip-card">
-                <div className="flip-card-inner">
-                  <div className="flip-card-front">
-                    <Typography variant="h3">{currentFlashcard.front}</Typography>
-                  </div>
-                  <div className="flip-card-back">
-                    <Typography variant="h3">{currentFlashcard.back}</Typography>
-                  </div>
-                </div>
-              </div>
-              <Stack direction="row" spacing={2}>
-                <Button onClick={handlePrevious} disabled={currentCardIndex === 0}>Previous</Button>
-                <Button onClick={handleNext} disabled={currentCardIndex === flashcards.length - 1}>Next</Button>
-              </Stack>
-            </Stack>
-          </Grid>
-          <Grid
-            item
-            xs={false}
-            sm={3}
-            md={3}
-            height="95%"
-            elevation={6}
-            square
-            borderRadius="15px"
-            backgroundColor='#FFFFFF'
-            boxShadow="0px 0px 20px #5F5F5F"
-          >
-            <Stack
-              direction="column"
-              fullWidth
-              height="100%"
-              p={2}
-              spacing={2}
-              justifyContent="space-between"
-            >
-              {/* Chat Input Area */}
-              <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}>
-                <TextField
-                  fullWidth
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  sx={{ border: '2px solid black', borderRadius: '15px' }}
-                  InputProps={{ style: { borderRadius: '12px' } }}
-                />
-                <Button
-                  onClick={handleSend}
-                  variant="filled"
-                  sx={{ backgroundColor: 'orange', border: '2px solid DarkOrange', boxShadow: '0px 0px 5px DarkOrange' }}
-                >
-                  Send
-                </Button>
-              </Stack>
-            </Stack>
-          </Grid>
-        </Grid>
+            <Button onClick={handlePrevious} disabled={currentCardIndex === 0}>Previous</Button>
+            <Button onClick={handleNext} disabled={currentCardIndex === flashcards.length - 1}>Next</Button>
+          </Box>
+        </Stack>
       </Stack>
-    </Container>
+    </Grid>
+    
+
+    {/* Right grid (Chat/Creation area) */}
+    <Grid
+      item
+      xs={false}
+      //moving right box a little bit inward
+      sm={3}
+      sx={{
+        marginLeft: '-40px', 
+        marginTop: '20px',
+        marginBottom: '20px',
+        padding: '20px',
+        backgroundColor: '#FFDBBB',
+        borderRadius: '16px',
+        boxShadow: '0px 0px 20px #5F5F5F',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        height: 'auto',
+      }}
+    >
+      <Stack direction="column" width="100%" spacing={4}>
+        {/* Chat Input Area */}
+        <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}>
+          <TextField
+            fullWidth
+            value={chatInput}
+            onChange={(e) => setChatInput(e.target.value)}
+            sx={{ border: '2px solid black', borderRadius: '15px' }}
+            InputProps={{ style: { borderRadius: '12px' } }}
+          />
+          <Button
+            onClick={handleSend}
+            variant="filled"
+            sx={{ backgroundColor: 'orange', border: '2px solid DarkOrange', boxShadow: '0px 0px 5px DarkOrange' }}
+          >
+            Create
+          </Button>
+        </Stack>
+      </Stack>
+    </Grid>
+  </Grid>
+
+   {/* Random Feedback Box */}
+   {boxVisible && (
+          <Box
+            sx={{
+              position: 'absolute',
+              top: boxPosition.top,
+              left: boxPosition.left,
+              backgroundColor: isCorrect ? 'green' : 'red',
+              color: 'white',
+              padding: '20px',
+              borderRadius: '10px',
+              boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.5)',
+              transition: 'top 0.5s ease, left 0.5s ease',  // Smooth movement
+            }}
+          >
+            {isCorrect ? 'Correct!' : 'Incorrect!'}
+          </Box>
+        )}
+</Stack>
+</Container>
   );
 }
