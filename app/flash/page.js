@@ -170,7 +170,8 @@ export default function Home() {
                     >
                       <Typography fontFamily="monospace" variant="h6">Type answer below:</Typography>
                       <Box borderRadius="15px" backgroundColor="#BFBFBF" height="52%" width="100%">
-                        <TextField fullWidth InputProps={{style : {borderRadius: "15px"}}}></TextField>
+                        <TextField  value={userAnswer}  // Bind input to userAnswer state
+    onChange={(e) => setUserAnswer(e.target.value)} fullWidth InputProps={{style : {borderRadius: "15px"}}}></TextField>
                       </Box>
                     </Stack>
                   
