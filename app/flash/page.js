@@ -4,6 +4,8 @@ import { Box, CssBaseline, Grid, Typography, Stack, TextField, Button, Container
 import { SignedOut, SignedIn, UserButton } from '@clerk/nextjs';
 import Head from 'next/head';
 
+var score = 0
+
 export default function Home() {
   // State for managing flashcards and navigation
   const [flashcards, setFlashcards] = useState([]);
@@ -20,8 +22,6 @@ export default function Home() {
   const [boxPosition, setBoxPosition] = useState({ top: '50%', left: '50%' });
 
   const [isCorrect, setIsCorrect] = useState(null);  // null means no answer yet
-
-  let score = 0
   
   const handleSend = async () => {
     if (!chatInput) return;
@@ -78,12 +78,15 @@ export default function Home() {
     // Check if the user's answer matches the back of the flashcard
     if (useAnswer === correctAnswer) {
       setIsCorrect(true);  // Answer is correct
+      score += 1;
     } else {
       setIsCorrect(false);  // Answer is incorrect
     }
 
     setBoxPosition({ top: '10px', left: '50%', transform: 'translateX(-50%)' });  // Position at the top center
     setBoxVisible(true);  // Show feedback box
+
+    handleNext();
 
     // Clear the answer input after submission
     setUserAnswer('');
@@ -93,8 +96,6 @@ export default function Home() {
       setBoxVisible(false);  // Hide the feedback box after 3 seconds
     }, 3000);
   };
-  
-  score += isCorrect ? 1 : 0;
 
 //frontend css
   return (
@@ -143,7 +144,7 @@ export default function Home() {
     >
       {/* Flashcard content */}
       <Stack direction="column" alignItems="center" justifyContent="center" height="100%">
-        <div className="flip-card" style={{ marginBottom: '30px' }}>
+        <div className="flip-card" id="card" style={{ marginBottom: '30px' }}>
           <div className="flip-card-inner">
             <div className="flip-card-front">
               <Box display="flex" justifyContent="center" alignItems="center" height="100%" textAlign="center" p={2}>

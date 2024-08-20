@@ -81,7 +81,7 @@ a {
   transform-style: preserve-3d;
 }
 
-.flip-card:hover .flip-card-inner {
+.flip-card:hover .flip-card-inner, .flip-card:focus .flip-card-inner {
   transform: rotateX(180deg);
 }
 
