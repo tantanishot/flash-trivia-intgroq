@@ -21,8 +21,7 @@ export default function Home() {
 
   const [isCorrect, setIsCorrect] = useState(null);  // null means no answer yet
 
-
-
+  let score = 0
   
   const handleSend = async () => {
     if (!chatInput) return;
@@ -85,9 +84,6 @@ export default function Home() {
 
     setBoxPosition({ top: '10px', left: '50%', transform: 'translateX(-50%)' });  // Position at the top center
     setBoxVisible(true);  // Show feedback box
-  
-
-
 
     // Clear the answer input after submission
     setUserAnswer('');
@@ -98,7 +94,8 @@ export default function Home() {
     }, 3000);
   };
   
- 
+  score += isCorrect ? 1 : 0;
+
 //frontend css
   return (
     <Container maxWidth={false} disableGutters>
@@ -121,12 +118,12 @@ export default function Home() {
       </AppBar>
 
       <Stack
-  direction="row"
-  width="100vw"
-  height="100vh"
-  sx={{ overflow: 'hidden' }}
-  backgroundColor='#0F0F0F'
->
+        direction="row"
+        width="100vw"
+        height="100vh"
+        sx={{ overflow: 'hidden' }}
+        backgroundColor='#0F0F0F'
+      >
 
 
   
@@ -162,9 +159,9 @@ export default function Home() {
         </div>
         
       {/*Answer buttong*/}
-        <Box borderRadius= "15px" p={2} height="19vh" width="40vw" backgroundColor="#040404" boxShadow="0px 0px 15px #4A4A4A" alignContent="center" style={{ marginBottom: '30px' }}>
+        <Box borderRadius= "15px" p={2} height="15vh" width="40vw" backgroundColor="#040404" boxShadow="0px 0px 15px #4A4A4A" alignContent="center" style={{ marginBottom: '30px' }}>
                 <Stack
-                  direction="row" height="70%" justifyContent="space-between" spacing={5} >
+                  direction="row" height="100%" justifyContent="space-between" spacing={5} >
                     <Stack
                       direction="column" height="100%" width="80%"
                     >
@@ -198,7 +195,6 @@ export default function Home() {
       </Stack>
     </Grid>
     
-
     {/* Right grid (Chat/Creation area) */}
     <Grid
       item
@@ -219,8 +215,9 @@ export default function Home() {
         height: '50vh',
       }}
     >
-      <Stack direction="column" width="100%" spacing={4}>
+      <Stack direction="column" width="100%" spacing={1}>
         {/* Chat Input Area */}
+        <Typography variant="h6" color="black">Enter theme:</Typography>
         <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}>
           <TextField
             fullWidth
@@ -237,6 +234,11 @@ export default function Home() {
             Create
           </Button>
         </Stack>
+
+        <Typography variant="h6" color="black">Score:</Typography>
+        <Box fullWidth height="auto" textAlign="center">
+          <Typography variant="h6" color="black">{score}</Typography>
+        </Box>
       </Stack>
     </Grid>
   </Grid>
