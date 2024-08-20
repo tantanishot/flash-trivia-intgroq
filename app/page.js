@@ -1,5 +1,5 @@
 'use client'
-import { Box, CssBaseline, Grid, Paper, ThemeProvider, Typography, Stack, TextField, Button, Container, AppBar, Toolbar } from '@mui/material'
+import { Box, CssBaseline, Grid, Paper, ThemeProvider, Typography, Stack, TextField, Button, Container, AppBar, Toolbar, Divider } from '@mui/material'
 import { getStripe } from '@/utils/get-stripe'
 import Head from 'next/head'
 import { SignedOut, SignedIn, UserButton } from '@clerk/nextjs'
@@ -44,29 +44,37 @@ export default function Home() {
         height="100vh"
         backgroundColor='#0F0F0F'
         justifyContent="center"
+        alignItems="center"
       >
+        <Box
+          width="75%"
+          alignItems="center">
+          <Divider m={2} orientation="horizontal" sx={{bgcolor: '#7F7F7F'}} variant="center"/>
+        </Box>
+        
         <Box
           width="100%"
           display="flex"
           flexDirection="column"
           alignItems="center"
+          p={4}
         >
-          <Typography variant="h2">Flash Trivia</Typography>
-          <Typography variant="h5">Insert cool info here</Typography>
-          <Button variant="filled" sx={{backgroundColor: 'orange', border: '2px solid DarkOrange', boxShadow: '0px 0px 5px DarkOrange'}}>Get Started</Button>
+          <Typography variant="h2"><strong>Flash Trivia</strong></Typography>
+          <Typography variant="h5" p={4}>Hone your knowledge in any topic with our innovative flash card service!</Typography>
+          <SignedIn>
+            <Button variant="filled" href="/flash" sx={{backgroundColor: 'orange', border: '2px solid DarkOrange', boxShadow: '0px 0px 5px DarkOrange'}}>Quiz Yourself</Button>
+          </SignedIn>
+          <SignedOut>
+            <Button variant="filled" href="/sign-up" sx={{backgroundColor: 'orange', border: '2px solid DarkOrange', boxShadow: '0px 0px 5px DarkOrange'}}>Get Started</Button>
+          </SignedOut>
         </Box>
 
         <Box
-          width="100%"
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          padding={4}
-        >
-          <Typography variant="h4">One Payment</Typography>
-          <Typography variant="h6">We follow a one-time payment model to ensure that our service is accesible for all.</Typography>
-          <Button variant="filled" sx={{backgroundColor: 'orange', border: '2px solid DarkOrange', boxShadow: '0px 0px 5px DarkOrange'}}>Subscribe</Button>
+          width="75%"
+          alignItems="center">
+          <Divider m={2} orientation="horizontal" sx={{bgcolor: '#7F7F7F'}} variant="center"/>
         </Box>
+        
       </Stack>
     </Container>
   );

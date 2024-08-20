@@ -207,7 +207,7 @@ export default function Home() {
       sm={3}
       sx={{
         marginLeft: '-40px', 
-        marginTop: '20px',
+        marginTop: '20vh',
         marginBottom: '20px',
         padding: '20px',
         backgroundColor: '#FFDBBB',
@@ -216,7 +216,7 @@ export default function Home() {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'flex-start',
-        height: 'auto',
+        height: '50vh',
       }}
     >
       <Stack direction="column" width="100%" spacing={4}>
